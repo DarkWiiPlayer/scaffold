@@ -77,7 +77,7 @@ function scaffold.builddir(prefix, tab)
 		prefix = '.'
 	end
 
-	if not type(tab) == 'table' then
+	if type(tab) ~= 'table' then
 		error("Invalid argument; expected table, got "..type(tab), 1)
 	end
 
