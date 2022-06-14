@@ -4,6 +4,10 @@
 
 This library offers a collection of helpers to quickly build custom project scaffolding into Lua projects by turning table structures into directory structures.
 
+## Documentation
+
+Clone the project and run `ldoc` to generate the documentation.
+
 ## Examples
 
 ### Building a Directory
