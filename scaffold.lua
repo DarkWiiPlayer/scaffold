@@ -36,7 +36,11 @@ function scaffold.file(buffer, file)
 	local bytes = 0
 	local close = false
 	if type(file) == "string" then
-		file = io.open(file, "wb")
+		local err
+		file, err = io.open(file, "wb")
+		if not file then
+			return nil, err
+		end
 		close = true
 	end
 	if type(buffer) == "string" then
