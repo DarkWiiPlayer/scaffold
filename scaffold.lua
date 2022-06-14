@@ -71,14 +71,14 @@ end
 -- 		delete_me = false; -- will be deleted
 -- 	}
 function scaffold.builddir(prefix, tab)
-	if lfs.attributes(prefix, 'mode') ~= "directory" then
-		scaffold.buildpath(prefix)
-	end
-
 	-- Prefix is optional
 	if not tab then
 		tab = prefix
 		prefix = '.'
+	end
+
+	if lfs.attributes(prefix, 'mode') ~= "directory" then
+		scaffold.buildpath(prefix)
 	end
 
 	if type(tab) ~= 'table' then
@@ -102,9 +102,9 @@ function scaffold.builddir(prefix, tab)
 				scaffold.builddir(path, value)
 			end
 		elseif type(value) == "string" then
-			scaffold.file(path, value)
+			scaffold.file(value, path)
 		elseif value==true then
-			scaffold.file(path, "")
+			scaffold.file("", path)
 		elseif value==false then
 			scaffold.delete(path)
 		else
