@@ -6,7 +6,8 @@ This library offers a collection of helpers to quickly build custom project scaf
 
 ## Documentation
 
-Clone the project and run `ldoc` to generate the documentation.
+Clone the project and run `ldoc` to generate the documentation
+or view it online at [darkwiiplayer.github.io/scaffold](https://darkwiiplayer.github.io/scaffold/).
 
 ## Examples
 
