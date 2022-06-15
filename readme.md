@@ -27,3 +27,17 @@ Clone the project and run `ldoc` to generate the documentation.
 			{ _VERSION, " says hi" },
 		};
 	}
+
+This will populate an empty directory like this:
+
+	$ tree
+	.
+	├── subdir
+	│   ├── empty_file
+	│   └── text_file
+	└── text_file
+
+	$ cat text_file 
+	line 1
+	line 2
+	Lua 5.4 says hi
