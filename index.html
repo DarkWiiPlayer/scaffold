@@ -1,0 +1,231 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>Reference</title>
+    <link rel="stylesheet" href="ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>ldoc</h1>
+
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Functions">Functions</a></li>
+</ul>
+
+
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li><strong>scaffold</strong></li>
+</ul>
+<h2>Topics</h2>
+<ul class="">
+  <li><a href="topics/readme.md.html">readme</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Module <code>scaffold</code></h1>
+<p>A collection of functions that write things to a directory</p>
+<p>
+
+</p>
+
+
+<h2><a href="#Functions">Functions</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#buildpath">buildpath (path)</a></td>
+	<td class="summary">Creates a directory and all necessary parent directories.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#delete">delete (path)</a></td>
+	<td class="summary">Deletes a file or directory recursively</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#file">file (buffer, file)</a></td>
+	<td class="summary">Writes an arbitrarily nested sequence of strings to a file</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#builddir">builddir ([prefix="."], tab)</a></td>
+	<td class="summary">Builds a directory structure recursively from a table template.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#readdir">readdir (path)</a></td>
+	<td class="summary">Reads a directory into a table</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "buildpath"></a>
+    <strong>buildpath (path)</strong>
+    </dt>
+    <dd>
+    Creates a directory and all necessary parent directories.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">path</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "delete"></a>
+    <strong>delete (path)</strong>
+    </dt>
+    <dd>
+    Deletes a file or directory recursively
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">path</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+         The path to the file or directory to delete
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "file"></a>
+    <strong>file (buffer, file)</strong>
+    </dt>
+    <dd>
+    Writes an arbitrarily nested sequence of strings to a file
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">buffer</span>
+         A string or nested sequence of strings to be written.
+        </li>
+        <li><span class="parameter">file</span>
+            <span class="types"><a class="type" href="index.html#file">file</a></span>
+         A file to write to (can be string or object with <code>write</code> method).
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">number</span></span>
+        The number of bytes that were written
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "builddir"></a>
+    <strong>builddir ([prefix="."], tab)</strong>
+    </dt>
+    <dd>
+    Builds a directory structure recursively from a table template.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">prefix</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.1/manual.html#5.4">string</a></span>
+         A prefix to the path, aka. where to initialize the directory structure.
+         (<em>default</em> ".")
+        </li>
+        <li><span class="parameter">tab</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.1/manual.html#5.5">table</a></span>
+         A table representing the directory structure.
+ Table entries are subdirectories, strings are files, false means delete,
+ true means touch file, everything else is an error.
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">builddir {
+	sub_dir = {
+		file = <span class="string">'Hello World!'</span>; <span class="comment">-- new file
+</span>	}
+	empty = <span class="keyword">true</span>; <span class="comment">-- new empty file
+</span>	delete_me = <span class="keyword">false</span>; <span class="comment">-- will be deleted
+</span>}</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "readdir"></a>
+    <strong>readdir (path)</strong>
+    </dt>
+    <dd>
+    Reads a directory into a table
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">path</span>
+
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+<i style="float:right;">Last updated 2022-06-15 08:45:07 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>
