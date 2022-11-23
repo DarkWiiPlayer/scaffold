@@ -4,6 +4,25 @@ local lfs = require 'lfs'
 
 local scaffold = {}
 
+--- Helper function to avoid messy indentation in source files.
+-- Removes whitespace up to and including the first non-whitespace character at the beginning of every line.
+-- @tparam string input A multiline string to remve indentation from.
+-- @usage
+-- scaffold.unindent [[
+-- 	|-- This file was generated automatically
+-- 	|function do_things()
+-- 	|	print "This Lua file is nicely formatted"
+-- 	|end
+-- ]]
+function scaffold.unindent(input)
+	if type(input) ~= "string" then
+		error("Expected string, got "..type(input))
+	end
+	return input:gsub("[^\n]+", function(line)
+		return line:gsub("^%s*[^%s]", "")
+	end)
+end
+
 --- Creates a directory and all necessary parent directories.
 function scaffold.buildpath(path)
 	local slash = 0

@@ -74,3 +74,15 @@ describe 'scaffold', ->
 				scaffold.delete 'test'
 				scaffold.builddir 'test', dir
 				assert.same dir, scaffold.readdir 'test'
+	
+	describe 'unindent', ->
+		it 'removes spaces', ->
+			assert.equal "foo", scaffold.unindent "  #foo"
+		it 'preserves spaces after character', ->
+			assert.equal " foo", scaffold.unindent "  # foo"
+		it 'removes tabs', ->
+			assert.equal "foo", scaffold.unindent "	#foo"
+		it 'handles mixed indentation', ->
+			assert.equal "foo", scaffold.unindent "	 #foo"
+		it 'handles several lines', ->
+			assert.equal "foo\n	bar\nbaz", scaffold.unindent "	|foo\n	|	bar\n	|baz"
