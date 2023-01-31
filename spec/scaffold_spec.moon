@@ -86,3 +86,33 @@ describe 'scaffold', ->
 			assert.equal "foo", scaffold.unindent "	 #foo"
 		it 'handles several lines', ->
 			assert.equal "foo\n	bar\nbaz", scaffold.unindent "	|foo\n	|	bar\n	|baz"
+
+	describe 'deep', ->
+		describe 'with table path', ->
+			it 'reads from tables', ->
+				t = { foo: 10, bar: { baz: 20 } }
+				assert.equal 10, scaffold.deep t, { "foo" }
+				assert.equal 20, scaffold.deep t, { "bar", "baz" }
+			it 'inserts into tables', ->
+				t = {}
+				scaffold.deep t, {'foo'}, 10
+				assert.equal 10, t.foo
+			it 'deletes from tables', ->
+				t = { foo: 10 }
+				scaffold.deep t, { 'foo' }, nil
+				assert.nil t.foo
+			it 'fails for empty path', ->
+				assert.errors ->
+					scaffold.deep {}, {}, 10
+		describe 'with string path', ->
+			it 'reads from tables', ->
+				t = { foo: 10, bar: { baz: 20 } }
+				assert.equal 10, scaffold.deep t, "foo"
+				assert.equal 20, scaffold.deep t, "bar/baz"
+			it 'inserts into tables', ->
+				t = {}
+				scaffold.deep t, 'foo', 10
+				assert.equal 10, t.foo
+			it 'fails for empty path', ->
+				assert.errors ->
+					scaffold.deep {}, '', 10

@@ -42,3 +42,8 @@ This will populate an empty directory like this:
 	line 1
 	line 2
 	Lua 5.4 says hi
+
+## Changelog
+
+**dev**
+- Add `deep` method for nested table accessing

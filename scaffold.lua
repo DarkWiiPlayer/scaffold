@@ -148,4 +148,33 @@ function scaffold.readdir(path)
 	end
 end
 
+--- Reads or writes a value in a nested table at a given path
+function scaffold.deep(object, path, ...)
+	if type(path) == "table" then
+		if #path == 0 then
+			error("Attempt to index with empty path", 2)
+		end
+		for i=1, #path-1 do
+			if object[path[i]] then
+				object = object[path[i]]
+			else
+				object[path[i]] = {}
+				object = object[path[i]]
+			end
+		end
+		local last = path[#path]
+		if select('#', ...) == 0 then
+			return object[last]
+		else
+			object[last] = (...)
+		end
+	else
+		local new = {}
+		for fragment in string.gmatch(path, "[^/]+") do
+			table.insert(new, fragment)
+		end
+		return scaffold.deep(object, new, ...)
+	end
+end
+
 return scaffold
