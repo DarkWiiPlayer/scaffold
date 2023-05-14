@@ -4,6 +4,7 @@ source = {
 	url = "git+https://github.com/darkwiiplayer/scaffold"
 }
 description = {
+	summary = "A library to assemble directory structures from Lua tables",
 	homepage = "https://github.com/darkwiiplayer/scaffold",
 	license = "Unlicense"
 }
