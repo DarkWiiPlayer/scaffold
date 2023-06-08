@@ -66,14 +66,24 @@ describe 'scaffold', ->
 				scaffold.builddir 'EEEEEEEEE'
 
 	describe 'readdir', ->
+		dir = { foo: { bar: "baz" } }
+		before_each -> scaffold.builddir 'test', dir
+		after_each -> scaffold.delete 'test'
 		it 'reads directories and files', ->
-			for dir in *{
-				{ foo: "bar" }
-				{ foo: { bar: "baz" } }
-			}
-				scaffold.delete 'test'
-				scaffold.builddir 'test', dir
-				assert.same dir, scaffold.readdir 'test'
+			assert.same dir, scaffold.readdir 'test'
+		it 'skips files when requested', ->
+			loaded = scaffold.readdir 'test', false
+			assert.is.nil loaded.foo.bar
+		it 'loads files as true when requested', ->
+			loaded = scaffold.readdir 'test', true
+			assert.is.true loaded.foo.bar
+		it 'returns file handles when requested', ->
+			loaded = scaffold.readdir 'test', 'handle'
+			assert.equal 'file', io.type loaded.foo.bar
+		it 'lazy loads files when requested', ->
+			loaded = scaffold.readdir 'test', 'lazy'
+			assert.is.table loaded.foo.bar
+			assert.is.equal "baz", tostring(loaded.foo.bar)
 	
 	describe 'unindent', ->
 		it 'removes spaces', ->

@@ -1,8 +1,31 @@
 --- A collection of functions that write things to a directory
+-- @module
 
 local lfs = require 'lfs'
 
 local scaffold = {}
+
+scaffold.lazy = setmetatable({
+	__tostring = function(self)
+		if not self.contents then
+			local iotype = io.type(self.file)
+			if iotype == "file" then
+				self.file:seek("set", 0)
+				self.contents = self.file:read("*a")
+			elseif iotype == "closed file" then
+				error("Attempting to read closed file handle")
+			else
+				error("field 'file' is not a file handle")
+			end
+		end
+		return self.contents
+	end
+}, {
+	-- note: checking the metatable against `scaffold.lazy` further down; don't change that
+	__call = function(self, path)
+		return setmetatable({file=io.open(path)}, self)
+	end
+})
 
 --- Helper function to avoid messy indentation in source files.
 -- Removes whitespace up to and including the first non-whitespace character at the beginning of every line.
@@ -122,6 +145,8 @@ function scaffold.builddir(prefix, tab)
 			end
 		elseif type(value) == "string" then
 			scaffold.file(value, path)
+		elseif getmetatable(value) == scaffold.lazy then
+			scaffold.file(tostring(value), path)
 		elseif value==true then
 			scaffold.file("", path)
 		elseif value==false then
@@ -132,19 +157,37 @@ function scaffold.builddir(prefix, tab)
 	end
 end
 
---- Reads a directory into a table
-function scaffold.readdir(path)
+--- Reads a directory into a table.
+-- Different modes of handling files are supported via the second parameter:
+-- `false` to skip files entirely and only build a tree of nested tables.
+-- `"handle"` to open the file and return a handle to it.
+-- `"lazy"` to return an object that loads the file lazily when `tostring` is called on it.
+-- `true` to return `true` (creates an empty file when fed into `builddir`)
+-- `nile` or anything else to read the file as a string.
+-- @tparam string path The path to the file or directory to read
+-- @param files How to handle files
+function scaffold.readdir(path, files)
 	local mode = lfs.attributes(path, 'mode')
 	if mode == 'directory' then
 		local result = {}
 		for name in lfs.dir(path) do
 			if name:sub(1, 1) ~= '.' then
-				result[name] = scaffold.readdir(path.."/"..name)
+				result[name] = scaffold.readdir(path.."/"..name, files)
 			end
 		end
 		return result
 	elseif mode == 'file' then
-		return(io.open(path, 'rb'):read('a'))
+		if files == false then
+			return
+		elseif files == "handle" then
+			return io.open(path, 'rb')
+		elseif files == "lazy" then
+			return scaffold.lazy(path)
+		elseif files == true then
+			return true
+		else
+			return(io.open(path, 'rb'):read('a'))
+		end
 	end
 end
 
