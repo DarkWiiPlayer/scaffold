@@ -1,5 +1,5 @@
 --- A collection of functions that write things to a directory
--- @module
+-- @module scaffold
 
 local lfs = require 'lfs'
 
@@ -157,22 +157,25 @@ function scaffold.builddir(prefix, tab)
 	end
 end
 
+--- Controls the behaviour of `scaffold.readdir`.
+-- @table read_options
+-- @field[opt=nil] files How to treat files
+-- @tfield[opt=false] boolean hidden Whether to include display hidden files
+
 --- Reads a directory into a table.
--- Different modes of handling files are supported via the second parameter:
--- `false` to skip files entirely and only build a tree of nested tables.
--- `"handle"` to open the file and return a handle to it.
--- `"lazy"` to return an object that loads the file lazily when `tostring` is called on it.
--- `true` to return `true` (creates an empty file when fed into `builddir`)
--- `nile` or anything else to read the file as a string.
 -- @tparam string path The path to the file or directory to read
--- @param files How to handle files
-function scaffold.readdir(path, files)
+-- @tparam[opt={}] table opt Options table conformign to `read_options`
+function scaffold.readdir(path, options)
 	local mode = lfs.attributes(path, 'mode')
+	local files = options and options.files
+	local hidden = options and options.hidden
 	if mode == 'directory' then
 		local result = {}
 		for name in lfs.dir(path) do
-			if name:sub(1, 1) ~= '.' then
-				result[name] = scaffold.readdir(path.."/"..name, files)
+			if name ~= '.' and name ~= '..' then
+				if hidden or name:sub(1,1) ~= "." then
+					result[name] = scaffold.readdir(path.."/"..name, options)
+				end
 			end
 		end
 		return result

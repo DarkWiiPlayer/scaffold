@@ -72,18 +72,22 @@ describe 'scaffold', ->
 		it 'reads directories and files', ->
 			assert.same dir, scaffold.readdir 'test'
 		it 'skips files when requested', ->
-			loaded = scaffold.readdir 'test', false
+			loaded = scaffold.readdir 'test', files: false
 			assert.is.nil loaded.foo.bar
 		it 'loads files as true when requested', ->
-			loaded = scaffold.readdir 'test', true
+			loaded = scaffold.readdir 'test', files: true
 			assert.is.true loaded.foo.bar
 		it 'returns file handles when requested', ->
-			loaded = scaffold.readdir 'test', 'handle'
+			loaded = scaffold.readdir 'test', files: 'handle'
 			assert.equal 'file', io.type loaded.foo.bar
 		it 'lazy loads files when requested', ->
-			loaded = scaffold.readdir 'test', 'lazy'
+			loaded = scaffold.readdir 'test', files: 'lazy'
 			assert.is.table loaded.foo.bar
-			assert.is.equal "baz", tostring(loaded.foo.bar)
+			assert.equal "baz", tostring(loaded.foo.bar)
+		it 'ignores hidden files by default', ->
+			scaffold.builddir "test", { ".hidden": { ".foo": "secret" } }
+			assert.same dir, scaffold.readdir 'test'
+			assert.same { ".foo": "secret" }, scaffold.readdir('test', hidden: true)[".hidden"]
 	
 	describe 'unindent', ->
 		it 'removes spaces', ->
