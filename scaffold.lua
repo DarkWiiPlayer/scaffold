@@ -171,10 +171,13 @@ function scaffold.readdir(path, options)
 	local hidden = options and options.hidden
 	if mode == 'directory' then
 		local result = {}
-		for name in lfs.dir(path) do
-			if name ~= '.' and name ~= '..' then
-				if hidden or name:sub(1,1) ~= "." then
-					result[name] = scaffold.readdir(path.."/"..name, options)
+		local success, iter,state = pcall(lfs.dir, path)
+		if success then
+			for name in iter,state do
+				if name ~= '.' and name ~= '..' then
+					if hidden or name:sub(1,1) ~= "." then
+						result[name] = scaffold.readdir(path.."/"..name, options)
+					end
 				end
 			end
 		end
