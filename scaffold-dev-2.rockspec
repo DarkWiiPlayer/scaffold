@@ -1,5 +1,5 @@
 package = "scaffold"
-version = "dev-1"
+version = "dev-2"
 source = {
 	url = "git+https://github.com/darkwiiplayer/scaffold"
 }
@@ -15,5 +15,10 @@ build = {
 	type = "builtin",
 	modules = {
 		scaffold = "scaffold.lua"
+	},
+	install = {
+		bin = {
+			"bin/scaffold"
+		}
 	}
 }

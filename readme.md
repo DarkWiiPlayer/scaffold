@@ -43,7 +43,22 @@ This will populate an empty directory like this:
 	line 2
 	Lua 5.4 says hi
 
-## Changelog
+## Commandline tool
 
-**dev**
-- Add `deep` method for nested table accessing
+Scaffold also provides a simple commandline tool to generate directories.
+
+The tool is called as `scaffold <name> ...args`, where `name` is the name of a
+Lua submodule that gets required as `require("scaffold."..name)`.
+
+The module can either directly return a table to be turned into a directory, or
+a function that gets called with all the extra commandline arguments after the
+module name.
+
+To load scaffold modules from directories that shouldn't otherwise be available
+to Lua, the environment variable `SCAFFOLD_DIR` can be used. This variable can
+contain a semicolon-separated list of directories that will be prepended to
+`package.path` at the start of the script.
+
+Note that this variable should only contain paths to the library folder, and
+scaffold will add the `?.lua` and `?/init.lua` parts that `package.path`
+expects.
