@@ -41,9 +41,28 @@ function scaffold.unindent(input)
 	if type(input) ~= "string" then
 		error("Expected string, got "..type(input))
 	end
-	return input:gsub("[^\n]+", function(line)
+	return (input:gsub("[^\n]+", function(line)
 		return line:gsub("^%s*[^%s]", "")
-	end)
+	end))
+end
+
+--- Helper function for simple variable replacement.
+-- Give this function a table mapping variable names to their values,
+-- and it will return a function that does a simple search-and-replace.
+-- Variables are assumed to start with a dollar sign.
+-- For convenience, the result is also fed through `scaffold.unindent`.
+-- @param mapping Third argument to `string.gsub`
+-- @usage
+-- 	local I = scaffold.replace {
+-- 		name = "Scaffold";
+-- 	}
+-- 	print(I[[
+-- 		|$name is awesome
+-- 	|]])
+function scaffold.replace(mapping)
+	return function(str)
+		return scaffold.unindent(str:gsub("$(%w+)", mapping))
+	end
 end
 
 --- Creates a directory and all necessary parent directories.
