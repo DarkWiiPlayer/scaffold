@@ -42,7 +42,7 @@ end
 local template = require("scaffold."..name)
 
 if type(template) == "function" then
-	template = template(select(1, ...))
+	template = template(select(2, ...))
 end
 
 scaffold.builddir(template)
