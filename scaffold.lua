@@ -28,15 +28,8 @@ scaffold.lazy = setmetatable({
 })
 
 --- Helper function to avoid messy indentation in source files.
--- Removes whitespace up to and including the first non-whitespace character at the beginning of every line.
--- @tparam string input A multiline string to remve indentation from.
--- @usage
--- scaffold.unindent [[
--- 	|-- This file was generated automatically
--- 	|function do_things()
--- 	|	print "This Lua file is nicely formatted"
--- 	|end
--- ]]
+--- Removes whitespace up to and including the first non-whitespace character at the beginning of every line.
+--- @param input string A multiline string to remve indentation from.
 function scaffold.unindent(input)
 	if type(input) ~= "string" then
 		error("Expected string, got "..type(input))
@@ -47,18 +40,11 @@ function scaffold.unindent(input)
 end
 
 --- Helper function for simple variable replacement.
--- Give this function a table mapping variable names to their values,
--- and it will return a function that does a simple search-and-replace.
--- Variables are assumed to start with a dollar sign.
--- For convenience, the result is also fed through `scaffold.unindent`.
--- @param mapping Third argument to `string.gsub`
--- @usage
--- 	local I = scaffold.replace {
--- 		name = "Scaffold";
--- 	}
--- 	print(I[[
--- 		|$name is awesome
--- 	|]])
+--- Give this function a table mapping variable names to their values,
+--- and it will return a function that does a simple search-and-replace.
+--- Variables are assumed to start with a dollar sign.
+--- For convenience, the result is also fed through `scaffold.unindent`.
+--- @param mapping string|table|function Third argument to `string.gsub`
 function scaffold.replace(mapping)
 	return function(str)
 		return scaffold.unindent(str:gsub("$(%w+)", mapping))
@@ -66,6 +52,7 @@ function scaffold.replace(mapping)
 end
 
 --- Creates a directory and all necessary parent directories.
+--- @param path string
 function scaffold.buildpath(path)
 	local slash = 0
 	while slash do
@@ -75,7 +62,7 @@ function scaffold.buildpath(path)
 end
 
 --- Deletes a file or directory recursively
--- @tparam string path The path to the file or directory to delete
+--- @param path string The path to the file or directory to delete
 function scaffold.delete(path)
 	path = path:gsub('/+$', '')
 	local mode = lfs.attributes(path, 'mode')
@@ -89,20 +76,22 @@ function scaffold.delete(path)
 	os.remove(path)
 end
 
+--- @alias buffer string|[buffer]
+
 --- Writes an arbitrarily nested sequence of strings to a file
--- @param buffer A string or nested sequence of strings to be written.
--- @tparam file file A file to write to (can be string or object with `write` method).
--- @treturn number The number of bytes that were written
+--- @param buffer buffer A string or nested sequence of strings to be written.
+--- @param file file*|string A file to write to (can be string or object with `write` method).
+--- @return number?, string? bytes The number of bytes that were written
 function scaffold.file(buffer, file)
 	local bytes = 0
 	local close = false
 	if type(file) == "string" then
-		local err
-		file, err = io.open(file, "wb")
-		if not file then
+		local handle, err = io.open(file, "wb")
+		if handle then
+			file, close = handle, true
+		else
 			return nil, err
 		end
-		close = true
 	end
 	if type(buffer) == "string" then
 		file:write(buffer)
@@ -119,23 +108,21 @@ function scaffold.file(buffer, file)
 end
 
 --- Builds a directory structure recursively from a table template.
--- @tparam[opt="."] string prefix A prefix to the path, aka. where to initialize the directory structure.
--- @tparam table tab A table representing the directory structure.
--- Table entries are subdirectories, strings are files, false means delete,
--- true means touch file, everything else is an error.
--- @usage
--- 	builddir {
--- 		sub_dir = {
--- 			file = 'Hello World!'; -- new file
--- 		}
--- 		empty = true; -- new empty file
--- 		delete_me = false; -- will be deleted
--- 	}
+--- 	builddir {
+--- 		sub_dir = {
+--- 			file = 'Hello World!'; -- new file
+--- 		}
+--- 		empty = true; -- new empty file
+--- 		delete_me = false; -- will be deleted
+--- 	}
+--- @param prefix string|table A prefix to the path, aka. where to initialize the directory structure.
+--- @param tab table A table representing the directory structure.
+--- Table entries are subdirectories, strings are files, false means delete,
+--- true means touch file, everything else is an error.
 function scaffold.builddir(prefix, tab)
 	-- Prefix is optional
-	if not tab then
-		tab = prefix
-		prefix = '.'
+	if type(prefix) == "table" then
+		tab, prefix = prefix, "."
 	end
 
 	if lfs.attributes(prefix, 'mode') ~= "directory" then
@@ -177,13 +164,13 @@ function scaffold.builddir(prefix, tab)
 end
 
 --- Controls the behaviour of `scaffold.readdir`.
--- @table read_options
--- @field[opt=nil] files How to treat files
--- @tfield[opt=false] boolean hidden Whether to include display hidden files
+--- @class ReadOptions
+--- @field files any How to treat files
+--- @field hidden boolean Whether to include display hidden files
 
 --- Reads a directory into a table.
--- @tparam string path The path to the file or directory to read
--- @tparam[opt={}] table opt Options table conformign to `read_options`
+--- @param path string The path to the file or directory to read
+--- @param options ReadOptions
 function scaffold.readdir(path, options)
 	local mode = lfs.attributes(path, 'mode')
 	local files = options and options.files
@@ -217,6 +204,8 @@ function scaffold.readdir(path, options)
 end
 
 --- Reads or writes a value in a nested table at a given path
+--- @param object table|userdata
+--- @param path string|table
 function scaffold.deep(object, path, ...)
 	if type(path) == "table" then
 		if #path == 0 then
@@ -236,12 +225,14 @@ function scaffold.deep(object, path, ...)
 		else
 			object[last] = (...)
 		end
-	else
-		local new = {}
+	elseif type(path) == "string" then
+		local sequence = {}
 		for fragment in string.gmatch(path, "[^/]+") do
-			table.insert(new, fragment)
+			table.insert(sequence, fragment)
 		end
-		return scaffold.deep(object, new, ...)
+		return scaffold.deep(object, sequence, ...)
+	else
+		error("Path must be either a string or a sequence", 2)
 	end
 end
 
