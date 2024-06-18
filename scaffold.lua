@@ -36,7 +36,7 @@ function scaffold.unindent(input)
 	end
 	return (input:gsub("[^\n]+", function(line)
 		return line:gsub("^%s*[^%s]", "")
-	end))
+	end):gsub("\n%s+$", ""))
 end
 
 --- Helper function for simple variable replacement.
