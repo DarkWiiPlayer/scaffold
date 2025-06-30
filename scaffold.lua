@@ -8,24 +8,30 @@ local scaffold = {}
 scaffold.lazy = setmetatable({
 	__tostring = function(self)
 		if not self.contents then
-			local iotype = io.type(self.file)
-			if iotype == "file" then
-				self.file:seek("set", 0)
-				self.contents = self.file:read("*a")
-			elseif iotype == "closed file" then
-				error("Attempting to read closed file handle")
+			local file, err = io.open(self.path)
+			if file then
+				self.contents = file:read("*a")
 			else
-				error("field 'file' is not a file handle")
+				error("Could not open '" .. self.path .. "': " .. err)
 			end
 		end
 		return self.contents
+	end;
+
+	link_or_copy = function(self, to)
+		if lfs.attributes(self.path, "dev") == lfs.attributes(to, "dev") then
+			lfs.link(self.path, to)
+		else
+			scaffold.file(tostring(self), to)
+		end
 	end
 }, {
 	-- note: checking the metatable against `scaffold.lazy` further down; don't change that
 	__call = function(self, path)
-		return setmetatable({file=io.open(path)}, self)
+		return setmetatable({path=path}, self)
 	end
 })
+scaffold.lazy.__index = scaffold.lazy
 
 --- Helper function to avoid messy indentation in source files.
 --- Removes whitespace up to and including the first non-whitespace character at the beginning of every line.
@@ -76,7 +82,7 @@ function scaffold.delete(path)
 	os.remove(path)
 end
 
---- @alias buffer string|[buffer]
+--- @alias buffer string|string[]
 
 --- Writes an arbitrarily nested sequence of strings to a file
 --- @param buffer buffer A string or nested sequence of strings to be written.
@@ -125,19 +131,21 @@ function scaffold.builddir(prefix, tab)
 		tab, prefix = prefix, "."
 	end
 
-	if lfs.attributes(prefix, 'mode') ~= "directory" then
-		scaffold.buildpath(prefix)
-	end
-
 	if type(tab) ~= 'table' then
 		error("Invalid argument; expected table, got "..type(tab), 1)
+	end
+
+	if lfs.attributes(prefix, 'mode') ~= "directory" then
+		scaffold.buildpath(prefix)
 	end
 
 	for path, value in pairs(tab) do
 		if prefix then
 			path = prefix.."/"..tostring(path)
 		end
-		if type(value) == "table" then
+		if getmetatable(value) == scaffold.lazy then
+			value:link_or_copy(path)
+		elseif type(value) == "table" then
 			if value[1] then
 				scaffold.file(value, path)
 			else
@@ -151,8 +159,6 @@ function scaffold.builddir(prefix, tab)
 			end
 		elseif type(value) == "string" then
 			scaffold.file(value, path)
-		elseif getmetatable(value) == scaffold.lazy then
-			scaffold.file(tostring(value), path)
 		elseif value==true then
 			scaffold.file("", path)
 		elseif value==false then

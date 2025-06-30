@@ -64,6 +64,12 @@ describe 'scaffold', ->
 		it 'errors when not passed a table', ->
 			assert.errors ->
 				scaffold.builddir 'EEEEEEEEE'
+		it 'copies lazy files', ->
+			scaffold.builddir 'test/lazy_source', { file: "lazy_content" }
+			loaded = scaffold.readdir 'test/lazy_source', files: 'lazy'
+			scaffold.builddir 'test/lazy_dest', loaded
+			reloaded = scaffold.readdir 'test/lazy_dest'
+			assert.same 'lazy_content', reloaded.file
 
 	describe 'readdir', ->
 		dir = { foo: { bar: "baz" } }
